@@ -130,7 +130,9 @@ export function AccountNavButton(props: {
         size="xs"
         onClick={() => setModal(<RoleInfoPanel {...props} handleClose={() => setModal(null)} />)}
       >
-        View roles and identities
+        {i18n.translate('security.account.viewRolesAndIdentities', {
+          defaultMessage: 'View roles and identities',
+        })}
       </EuiButtonEmpty>
       {isMultiTenancyEnabled && props.config.multitenancy.enabled && (
         <>
