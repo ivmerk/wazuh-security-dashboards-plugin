@@ -12,6 +12,7 @@
  *   express or implied. See the License for the specific language governing
  *   permissions and limitations under the License.
  */
+import { i18n } from '@osd/i18n';
 import {
   EuiModal,
   EuiModalBody,
@@ -51,7 +52,9 @@ export function RoleInfoPanel(props: { coreStart: CoreStart; handleClose: () => 
             <h2>Roles ({roles.length})</h2>
           </EuiText>
           <EuiText color="subdued" size="s">
-            Roles you are currently mapped to by your administrator.
+            {i18n.translate('security.account.rolesDescription', {
+              defaultMessage: 'Roles you are currently mapped to by your administrator.',
+            })}
           </EuiText>
           <EuiSpacer />
           {roles.map((item) => (
@@ -65,7 +68,9 @@ export function RoleInfoPanel(props: { coreStart: CoreStart; handleClose: () => 
             <h2>Backend roles ({backendRoles.length})</h2>
           </EuiText>
           <EuiText color="subdued" size="s">
-            Backend roles you are currently mapped to by your administrator.
+            {i18n.translate('security.account.backendRolesDescription', {
+              defaultMessage: 'Backend roles you are currently mapped to by your administrator.',
+            })}
           </EuiText>
           <EuiSpacer />
           {backendRoles.map((item) => (
