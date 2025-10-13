@@ -14,6 +14,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiButtonEmpty } from '@elastic/eui';
 import { HttpStart } from 'opensearch-dashboards/public';
 import { externalLogout, logout } from './utils';
@@ -36,7 +37,9 @@ export function LogoutButton(props: {
           size="xs"
           onClick={() => externalLogout(props.http, OPENID_AUTH_LOGOUT)}
         >
-          Log out
+          {i18n.translate('security.account.logoutButton', {
+            defaultMessage: 'Log out',
+          })}
         </EuiButtonEmpty>
       </div>
     );
@@ -50,7 +53,9 @@ export function LogoutButton(props: {
           size="xs"
           onClick={() => externalLogout(props.http, SAML_AUTH_LOGOUT)}
         >
-          Log out
+          {i18n.translate('security.account.logoutButton', {
+            defaultMessage: 'Log out',
+          })}
         </EuiButtonEmpty>
       </div>
     );
@@ -67,7 +72,9 @@ export function LogoutButton(props: {
           size="xs"
           onClick={() => logout(props.http, props.logoutUrl)}
         >
-          Log out
+          {i18n.translate('security.account.logoutButton', {
+            defaultMessage: 'Log out',
+          })}
         </EuiButtonEmpty>
       </div>
     );
