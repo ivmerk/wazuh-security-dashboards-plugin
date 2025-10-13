@@ -19,9 +19,14 @@
   padding: 1rem;
   position: relative;
   color: #000000;
-}
 
-.btn-login {
-  color: #000000;
-  width: 100%;
+  .euiButton {
+    color: #000000 !important;
+    width: 100%;
+  }
+
+  .btn-login {
+    color: #000000 !important;
+    width: 100%;
+  }
 }

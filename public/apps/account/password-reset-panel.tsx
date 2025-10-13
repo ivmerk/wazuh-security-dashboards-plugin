@@ -80,22 +80,53 @@ export function PasswordResetPanel(props: PasswordResetPanelProps) {
   }, [props.coreStart.http]);
 
   const handleReset = async () => {
-    const http = props.coreStart.http;
-    // validate the current password
-    try {
-      await validateCurrentPassword(http, props.username, currentPassword);
-    } catch (e) {
+    // Reset all error states
+    setIsCurrentPasswordInvalid(false);
+    setCurrentPasswordError([]);
+    setIsNewPasswordInvalid(false);
+    setErrorCallOut('');
+
+    // Basic validation
+    if (!currentPassword) {
       setIsCurrentPasswordInvalid(true);
-      setCurrentPasswordError([constructErrorMessageAndLog(e, 'Invalid current password.')]);
+      setCurrentPasswordError(['Current password is required']);
+      return;
     }
 
-    // update new password
-    try {
-      await updateNewPassword(http, newPassword, currentPassword);
+    if (!newPassword) {
+      setIsNewPasswordInvalid(true);
+      setErrorCallOut('New password is required');
+      return;
+    }
 
+    if (newPassword !== repeatNewPassword) {
+      setIsRepeatNewPasswordInvalid(true);
+      setErrorCallOut('Passwords do not match');
+      return;
+    }
+
+    const http = props.coreStart.http;
+    
+    // Validate current password
+    try {
+      await validateCurrentPassword(http, props.username, currentPassword);
+      
+      // Update to new password
+      await updateNewPassword(http, newPassword, currentPassword);
+      
+      // Logout after successful password change
       await logout(http, props.logoutUrl);
     } catch (e) {
-      setErrorCallOut(constructErrorMessageAndLog(e, 'Failed to reset password.'));
+      const errorMessage = constructErrorMessageAndLog(e, 'Failed to reset password');
+      if (errorMessage.toLowerCase().includes('current password') || errorMessage.includes('401')) {
+        setIsCurrentPasswordInvalid(true);
+        setCurrentPasswordError(['Incorrect current password']);
+      } else if (errorMessage.toLowerCase().includes('password policy')) {
+        setIsNewPasswordInvalid(true);
+        setErrorCallOut(errorMessage);
+      } else {
+        setErrorCallOut(errorMessage);
+      }
     }
   };
 
@@ -106,9 +137,10 @@ export function PasswordResetPanel(props: PasswordResetPanelProps) {
         <EuiSpacer />
         <EuiModalBody>
           <EuiText size="s">
-            <h2>  {i18n.translate('security.account.resetPassword.resetPasswordMenu.title', {
-              defaultMessage: 'Reset password for {props.username}',
-            })} </h2>
+            <h2>{i18n.translate('security.account.resetPassword.resetPasswordMenu.title', {
+              defaultMessage: 'Reset password for {username}',
+              values: { username: props.username }
+            })}</h2>
           </EuiText>
 
           <EuiSpacer />
@@ -186,15 +218,19 @@ export function PasswordResetPanel(props: PasswordResetPanelProps) {
           )}
         </EuiModalBody>
         <EuiModalFooter>
-          <EuiSmallButtonEmpty data-test-subj="cancel" onClick={props.handleClose}>'
+          <EuiSmallButtonEmpty 
+            data-test-subj="cancel" 
+            onClick={props.handleClose}
+          >
             {i18n.translate('security.account.resetPassword.resetPasswordMenu.cancelButton', {
-              defaultMessage: 'Cancel'})}
+              defaultMessage: 'Cancel'
+            })}
           </EuiSmallButtonEmpty>
 
           <EuiSmallButton
             data-test-subj="reset"
             fill
-            disabled={isRepeatNewPasswordInvalid}
+            disabled={!currentPassword || !newPassword || newPassword !== repeatNewPassword}
             onClick={handleReset}
           >
             {i18n.translate('security.account.resetPassword.resetPasswordMenu.resetButton', {
